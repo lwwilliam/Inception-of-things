@@ -1,13 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: app-ingress
+  name: ingress-one
 spec:
-  defaultBackend:
-    service:
-      name: app-three
-      port:
-        number: 80
   rules:
   - host: app1.com
     http:
@@ -19,6 +14,14 @@ spec:
             name: app-one
             port:
               number: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-two
+spec:
+  rules:
   - host: app2.com
     http:
       paths:
@@ -29,8 +32,15 @@ spec:
             name: app-two
             port:
               number: 80
-  - host: app3.com
-    http:
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-three
+spec:
+  rules:
+  - http:
       paths:
       - path: /
         pathType: Prefix
@@ -39,8 +49,3 @@ spec:
             name: app-three
             port:
               number: 80
-  defaultBackend:
-    service:
-      name: app-three
-      port:
-        number: 80
