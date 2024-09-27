@@ -45,3 +45,5 @@ end
 
 # export PATH=$PATH:/sbin // for ifconfig to work
 # ip addr show eth1 // alt to show eth1 adpter
+
+# https://docs.k3s.io/datastore/ha-embedded
