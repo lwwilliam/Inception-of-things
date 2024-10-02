@@ -24,27 +24,27 @@ apiVersion: v1
 metadata:
   name: app
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 8888
       targetPort: 8888
   selector:
     app: app
 
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: app-ingress
-spec:
-  rules:
-    - http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service: app
-            port:
-              number: 8888
+#---
+#kind: Ingress
+#apiVersion: networking.k8s.io/v1
+#metadata:
+#  name: app-ingress
+#spec:
+#  rules:
+#    - http:
+#      paths:
+#        - path: /
+#          pathType: Prefix
+#          backend:
+#            service: app
+#            port:
+#              number: 8888
 
 #Error from server (BadRequest): error when creating "deployment.yaml": Ingress in version "v1" cannot be handled as a Ingress: strict decoding error: unknown field "spec.rules[0].paths"
