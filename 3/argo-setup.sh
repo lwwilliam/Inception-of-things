@@ -13,4 +13,4 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}
 kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
 
 kubectl apply -f deployment.yaml -n dev
-kubectl port-forward service/app 8888:8888 -n dev
+kubectl port-forward service/app -n dev 8888:8888 > /dev/null 2>&1 &
