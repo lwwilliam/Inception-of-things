@@ -15,3 +15,8 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
 kubectl create namespace dev
 kubectl apply -f deployment.yaml -n dev
 kubectl port-forward service/app -n dev 8888:8888 > /dev/null 2>&1 &
+
+kubectl config set-context --current --namespace=argocd
+argocd app create dev-app --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace dev
+
+argocd app set dev-app --sync-policy automated
