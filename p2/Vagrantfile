@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
     end
     config.vm.provision "shell", inline: <<-SHELL
       apt-get update
-      curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server --cluster-init --tls-san=192.168.56.110
+      curl -sfL https://get.k3s.io | sh -s - server --cluster-init --tls-san=192.168.56.110
       kubectl apply -f /vagrant_data/app1.yaml
       kubectl apply -f /vagrant_data/app2.yaml
       kubectl apply -f /vagrant_data/app3.yaml
