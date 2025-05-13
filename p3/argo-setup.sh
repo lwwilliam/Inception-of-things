@@ -20,3 +20,7 @@ kubectl config set-context --current --namespace=argocd
 argocd app create dev-app --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace dev
 
 argocd app set dev-app --sync-policy automated
+
+
+## Get ArgoCD Default password ##
+# kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
