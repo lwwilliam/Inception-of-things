@@ -17,3 +17,7 @@ Dockerizing K3s can also be installed using the official k3s installation with t
 [Quick Start Guide](https://docs.k3s.io/quick-start)
 
 [K3s Deployment](https://k3s.rocks/first-deploy/)
+
+[Kubectl Installation](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+
+[ArgoCD Setup Resources](https://www.sokube.io/en/blog/gitops-on-a-laptop-with-k3d-and-argocd-en)
