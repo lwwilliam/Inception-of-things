@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    app: will42
+  name: will42-app
+spec:
+  project: will42-proj
+  source:
+    repoURL: https://github.com/lwwilliam/iot-image.git
+    targetRevision: main
+    path: dev
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: will42-proj
+  labels:
+    app: will42
+spec:
+  # Project description
+  description: ArgoCD 42Project using will42
+  # Allow manifests to deploy only from Sokube git repositories
+  sourceRepos:
+  - "https://github.com/lwwilliam/*"
+  # Only permit to deploy applications in the same cluster
+  destinations:
+  - namespace: dev
+    server: https://kubernetes.default.svc
+  # Enables namespace orphaned resource monitoring.
+  orphanedResources:
+    warn: false
