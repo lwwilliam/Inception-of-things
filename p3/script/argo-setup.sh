@@ -13,8 +13,8 @@ rm argocd-linux-amd64
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 kubectl create namespace dev
-kubectl apply -f proj.yaml -n argocd
-kubectl apply -f app.yaml -n argocd
+kubectl apply -f ../conf/proj.yaml -n argocd
+kubectl apply -f ../conf/app.yaml -n argocd
 
 kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
 kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
