@@ -1,34 +1,76 @@
+# Vagrantfile for setting up two Debian 12 VMs with K3s using VMware Desktop
 Vagrant.configure("2") do |config|
-  config.vm.synced_folder "./conf", "/vagrant_data"
-  config.vm.define "lwilliamS" do |master|
-    master.vm.box = "generic/debian12"
-    master.vm.hostname = "lwilliamS"
-    master.vm.network "private_network", ip: "192.168.56.110"
-    master.vm.provider "vmware_desktop" do |vm|
+  # Ensures passwordless SSH key usage
+  config.ssh.insert_key = true
+
+  # Ensure the host folder is mounted as /vagrant inside the guest
+  config.vm.synced_folder ".", "/vagrant"
+
+  # --- K3s Controller Node ---
+  config.vm.define "lwilliamS" do |server|
+    server.vm.box = "generic/debian12"
+    server.vm.hostname = "lwilliamS"
+    server.vm.network "private_network", ip: "192.168.56.110"
+    server.vm.provider "vmware_desktop" do |vm|
       vm.force_vmware_license = "workstation"
       vm.vmx["memsize"] = "1024"
-      vm.vmx["numvcpus"] = "1"    
+      vm.vmx["numvcpus"] = "1"
     end
-    master.vm.provision "shell", inline: <<-SHELL
+
+    # Install K3s in server (controller) mode
+    server.vm.provision "shell", inline: <<-SHELL
       apt-get update
-      curl -sfL https://get.k3s.io | sh -
-      cp /var/lib/rancher/k3s/server/node-token /vagrant_data
+      apt-get install -y net-tools
+      curl -sfL https://get.k3s.io | sh -s - server --node-ip 192.168.56.110 --advertise-address 192.168.56.110
+
+      # Wait until the node-token is generated
+      echo "Waiting for node-token to be generated..."
+      while [ ! -f /var/lib/rancher/k3s/server/node-token ]; do
+        sleep 2
+      done
+
+      # Copy the node-token into the shared folder
+      cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
+      chmod 644 /vagrant/node-token
+      echo "Node token copied to /vagrant/node-token"
     SHELL
   end
 
-  config.vm.define "lwilliamSW" do |control|
-    control.vm.box = "generic/debian12"
-    control.vm.hostname = "lwilliamSW"
-    control.vm.network "private_network", ip: "192.168.56.111"
-    control.vm.provider "vmware_desktop" do |vm|
+  # --- K3s Agent Node ---
+  config.vm.define "lwilliamSW" do |worker|
+    worker.vm.box = "generic/debian12"
+    worker.vm.hostname = "lwilliamSW"
+    worker.vm.network "private_network", ip: "192.168.56.111"
+    worker.vm.provider "vmware_desktop" do |vm|
       vm.force_vmware_license = "workstation"
       vm.vmx["memsize"] = "1024"
-      vm.vmx["numvcpus"] = "1" 
+      vm.vmx["numvcpus"] = "1"
     end
-    control.vm.provision "shell", inline: <<-SHELL
+
+    # Install K3s in agent mode
+    worker.vm.provision "shell", inline: <<-SHELL
       apt-get update
-      cat /vagrant_data/node-token
-      curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$(cat /vagrant_data/node-token) sh -
+      apt-get install -y net-tools
+
+      # Wait for the node-token to appear in the shared folder
+      echo "Waiting for node-token from server..."
+      timeout=300
+      elapsed=0
+      while [ ! -f /vagrant/node-token ] && [ $elapsed -lt $timeout ]; do
+        echo "Waiting for node-token... (${elapsed}s)"
+        sleep 5
+        elapsed=$((elapsed + 5))
+      end
+
+      if [ ! -f /vagrant/node-token ]; then
+        echo "Error: node-token not found after ${timeout} seconds"
+        exit 1
+      fi
+
+      # Use the node-token to join this node as a K3s agent
+      echo "Node token found, installing k3s agent..."
+      curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$(cat /vagrant/node-token) sh -s - --node-ip 192.168.56.111
+      echo "K3s agent installation completed"
     SHELL
   end
 end
