@@ -5,7 +5,6 @@ Vagrant.configure("2") do |config|
     master.vm.hostname = "lwilliamS"
     master.vm.network "private_network", ip: "192.168.56.110"
     master.vm.provider "vmware_desktop" do |vm|
-      vm.force_vmware_license = "workstation"
       vm.vmx["memsize"] = "1024"
       vm.vmx["numvcpus"] = "1"    
     end
@@ -20,8 +19,7 @@ Vagrant.configure("2") do |config|
     control.vm.box = "generic/debian12"
     control.vm.hostname = "lwilliamSW"
     control.vm.network "private_network", ip: "192.168.56.111"
-    control.vm.provider "vmware_desktop" do |vm|
-      vm.force_vmware_license = "workstation"
+    master.vm.provider "vmware_desktop" do |vm|
       vm.vmx["memsize"] = "1024"
       vm.vmx["numvcpus"] = "1" 
     end

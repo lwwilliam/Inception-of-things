@@ -1,15 +1,14 @@
 Vagrant.configure("2") do |config|
   config.vm.synced_folder "./conf", "/vagrant_data"
-  config.vm.define "serverS" do |server|
-    server.vm.box = "generic/debian12"
-    server.vm.hostname = "serverS"
-    server.vm.network "private_network", ip: "192.168.56.110"
-    server.vm.provider "vmware_desktop" do |vm|
-      vm.force_vmware_license = "workstation"
+  config.vm.define "serverS" do |config|
+    config.vm.box = "generic/debian12"
+    config.vm.hostname = "serverS"
+    config.vm.network "private_network", ip: "192.168.56.110"
+    master.vm.provider "vmware_desktop" do |vm|
       vm.vmx["memsize"] = "1024"
       vm.vmx["numvcpus"] = "1"   
     end
-    server.vm.provision "shell", inline: <<-SHELL
+    config.vm.provision "shell", inline: <<-SHELL
       apt-get update
       curl -sfL https://get.k3s.io | sh -s - server --cluster-init --tls-san=192.168.56.110
       kubectl apply -f /vagrant_data/app1.yaml
